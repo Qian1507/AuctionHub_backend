@@ -18,6 +18,7 @@ namespace AuctionHub_backend.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto dto)
         {
             var result = await _userService.RegisterAsync(dto);
@@ -30,6 +31,7 @@ namespace AuctionHub_backend.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
         {
 
