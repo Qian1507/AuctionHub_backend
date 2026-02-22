@@ -1,0 +1,83 @@
+########################
+# OS / general
+########################
+.DS_Store
+Thumbs.db
+desktop.ini
+
+########################
+# Visual Studio / .NET
+########################
+
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+# VS cache/options
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/packages/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# MSBuild
+*.cache
+*.bak
+*.log
+*.tlog
+*.lastcodeanalysissucceeded
+
+# VS profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Publish profiles (user-specific)
+*.pubxml.user
+
+# ReSharper / other tools
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+########################
+# Entity Framework / database
+########################
+*.mdf
+*.ldf
+*.ndf
+
+########################
+# Logs / temp
+########################
+*.log
+*.svclog
+*.tmp
+*.temp
+
+########################
+# Misc
+########################
+*.swp
+*.*~
+*.orig
