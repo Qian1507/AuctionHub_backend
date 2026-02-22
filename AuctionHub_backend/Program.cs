@@ -22,12 +22,10 @@ builder.Services.AddSwaggerGen();
 
 //Repos
 builder.Services.AddScoped<IUserRepo, UserRepo>();
-builder.Services.AddScoped<IBidRepo, BidRepo>();
 builder.Services.AddScoped<IAuctionRepo, AuctionRepo>();
 
 //Services
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IBidService, BidService>();
 builder.Services.AddScoped<IAuctionService, AuctionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 

@@ -183,8 +183,8 @@ namespace AuctionHub_backend.Core.Services
                 CreatedAt = now
             };
 
-            await _context.Bid.AddAsync(bid);
-            return await _context.SaveChangesAsync() > 0;
+            await _auctionRepo.AddBidAsync(bid);
+            return await _auctionRepo.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<AuctionListDto>> SearchAsync(string? searchTerm, bool? isOpen)
@@ -200,10 +200,8 @@ namespace AuctionHub_backend.Core.Services
             {
                 all = all.Where(a => !a.IsDisabled && a.EndDate <= now);
             }
-            else
-            {
-                all = all.Where(a => !a.IsDisabled);
-            }
+            
+          
 
             var list = all
                 .Select(a =>
@@ -243,7 +241,11 @@ namespace AuctionHub_backend.Core.Services
 
             if (auction.EndDate <= now)
                 return false;
-
+            var hasBids = await _auctionRepo.HasBidsAsync(auctionId);
+            if (!hasBids)
+            {
+                auction.StartingPrice = dto.StartingPrice; 
+            }
             auction.Title = dto.Title;
             auction.Description = dto.Description;
             auction.EndDate = dto.EndDate;

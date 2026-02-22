@@ -19,6 +19,7 @@ namespace AuctionHub_backend.Data.Interfaces
 
         // Check if an auction has any bids (Critical for VG logic: preventing edits if bids exist)
         Task<bool> HasBidsAsync(int auctionId);
+        Task AddBidAsync(Bid bid);
 
         Task<bool> SaveChangesAsync();
 

@@ -32,6 +32,7 @@ namespace AuctionHub_backend.Data.Repos
         {
             var query = _context.Auction
                 .Include(a => a.CreatedByUser)
+                .Include(a=>a.Bids)
                 .AsQueryable();
 
             
@@ -40,7 +41,7 @@ namespace AuctionHub_backend.Data.Repos
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                
-                query = query.Where(a => a.Title.Contains(searchTerm));
+                query = query.Where(a => a.Title.Contains(searchTerm) || a.Description.Contains(searchTerm));
             }
 
             return await query.ToListAsync();
@@ -58,6 +59,7 @@ namespace AuctionHub_backend.Data.Repos
         public async Task<IEnumerable<Auction>> GetByUserIdAsync(int userId)
         {
             return await _context.Auction
+                .Include(a=> a.Bids)
                 .Where(a => a.CreatedByUserId == userId)
                 .ToListAsync();
         }
@@ -72,6 +74,9 @@ namespace AuctionHub_backend.Data.Repos
             return await _context.SaveChangesAsync() > 0;
         }
 
-       
+        public async Task AddBidAsync(Bid bid)
+        {
+            await _context.Bid.AddAsync(bid);
+        }
     }
 }
