@@ -155,15 +155,15 @@ namespace AuctionHub_backend.Core.Services
         {
             var auction = await _auctionRepo.GetByIdAsync(auctionId);
             if (auction == null || auction.IsDisabled)
-                return false;
+                throw new KeyNotFoundException("Auction not found or has been disabled.");
 
             var now = DateTime.UtcNow;
 
             if (!IsOpen(auction, now))
-                return false;
+                throw new InvalidOperationException("This auction is not open for bidding.");
 
             if (auction.CreatedByUserId == userId)
-                return false;
+                throw new InvalidOperationException("You cannot bid on your own auction.");
 
             var highestBid = auction.Bids
                 .OrderByDescending(b => b.Amount)
@@ -173,7 +173,12 @@ namespace AuctionHub_backend.Core.Services
             var minAmount = highestBid?.Amount ?? auction.StartingPrice;
 
             if (dto.Amount <= minAmount)
-                return false;
+            {
+                var errorMsg = highestBid == null
+                    ? $"Bid must be higher than starting price ({auction.StartingPrice})."
+                    : $"Bid must be higher than current highest bid ({highestBid.Amount}).";
+                throw new InvalidOperationException(errorMsg);
+            }
 
             var bid = new Bid
             {
@@ -232,15 +237,16 @@ namespace AuctionHub_backend.Core.Services
         {
             var auction = await _auctionRepo.GetByIdAsync(auctionId);
             if (auction == null || auction.IsDisabled)
-                return false;
+                throw new KeyNotFoundException("Auction not found.");
 
             if (auction.CreatedByUserId != userId)
-                return false;
+                throw new UnauthorizedAccessException("You are not authorized to update this auction.");
 
             var now = DateTime.UtcNow;
 
             if (auction.EndDate <= now)
-                return false;
+                throw new InvalidOperationException("Starting price cannot be changed after bids have been placed");
+
             var hasBids = await _auctionRepo.HasBidsAsync(auctionId);
             if (!hasBids)
             {
@@ -306,5 +312,50 @@ namespace AuctionHub_backend.Core.Services
                 CreatedAt = b.CreatedAt
             };
         }
+
+        public async Task<IEnumerable<AuctionListDto>> GetAllAuctionsAsync()
+        {
+            var all = await _auctionRepo.GetAllAsync(null);
+            var now = DateTime.UtcNow;
+
+            return all.Select(a => new AuctionListDto
+            {
+                Id = a.Id,
+                Title = a.Title,
+                StartingPrice = a.StartingPrice,
+                CurrentHighestBid = a.Bids.OrderByDescending(b => b.Amount).FirstOrDefault()?.Amount ?? a.StartingPrice,
+                EndDate = a.EndDate,
+                IsOpen = IsOpen(a, now),
+                IsDisabled = a.IsDisabled, 
+                CreatedByUserName = a.CreatedByUser?.Name ?? "Unknown"
+            }).ToList();
+        }
+
+        public async Task<IEnumerable<AuctionListDto>> GetAuctionsByUserIdAsync(int userId)
+        {
+            var auctions = await _auctionRepo.GetByUserIdAsync(userId);
+            var now = DateTime.UtcNow;
+
+            return auctions.Select(a =>
+            {
+                var highestBid = a.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
+                var currentHighest = highestBid?.Amount ?? a.StartingPrice;
+
+                return new AuctionListDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    StartingPrice = a.StartingPrice,
+                    StartDate = a.StartDate,
+                    EndDate = a.EndDate,
+                    CreatedByUserId = a.CreatedByUserId,
+                    CreatedByUserName = a.CreatedByUser?.Name ?? string.Empty,
+                    IsOpen = a.IsOpen,
+                    CurrentHighestBid = currentHighest
+                };
+            }).ToList();
+        }
+
     }
 }

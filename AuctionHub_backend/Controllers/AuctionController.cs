@@ -11,6 +11,7 @@ namespace AuctionHub_backend.Controllers
     [ApiController]
     public class AuctionController : ControllerBase
     {
+
         private readonly IAuctionService _auctionService;
 
         public AuctionController(IAuctionService auctionService)
@@ -18,15 +19,34 @@ namespace AuctionHub_backend.Controllers
             _auctionService = auctionService;
         }
 
-        [HttpGet]
+
+        //Auction
+        //GET /api/auction?searchTerm=&isOpen=
+        [HttpGet("Search")]
         [AllowAnonymous]
+        [EndpointSummary("Search auctions by title and open/closed status")]
         public async Task<IActionResult> Search([FromQuery] string? searchTerm, [FromQuery] bool? isOpen)
         {
             var auctions = await _auctionService.SearchAsync(searchTerm, isOpen);
             return Ok(auctions);
         }
 
-        [HttpGet("{id}")]
+
+        [HttpGet("MyAuctions")]
+        [Authorize]
+        public async Task<IActionResult> GetMyAuctions()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
+            var result = await _auctionService.GetAuctionsByUserIdAsync(userId.Value);
+            return Ok(result);
+        }
+
+
+
+        //GET /api/auction/{id}?includeHistory=true
+        [HttpGet("GetById/{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id, [FromQuery] bool includeHistory = true)
         {
@@ -35,7 +55,9 @@ namespace AuctionHub_backend.Controllers
             return Ok(auction);
         }
 
-        [HttpPost]
+
+        //POST /api/auction
+        [HttpPost("Create")]
         [Authorize]
         public async Task<IActionResult> Create([FromBody] AuctionCreateDto dto)
         {
@@ -46,33 +68,69 @@ namespace AuctionHub_backend.Controllers
             return success ? Ok(new { message = "Auction created" }) : BadRequest("Invalid data or dates.");
         }
 
-        [HttpPut("{id}")]
+
+        //PUT /api/auction/{id}
+        [HttpPut("Update/{id}")]
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] AuctionUpdateDto dto)
         {
             var userId = GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var success = await _auctionService.UpdateAsync(userId.Value, id, dto);
-            return success 
-                ? Ok(new { message = "Update successful" })
-                : BadRequest("Update failed (unauthorized or auction is closed).");
+            try
+            {
+                var success = await _auctionService.UpdateAsync(userId.Value, id, dto);
+                return Ok(new { message = "Update successful" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(); 
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred while updating the auction.");
+            }
         }
 
-      
-        [HttpPost("{id}/bid")]
+
+        //Bid
+        // POST /api/auction/{id}/bid
+        [HttpPost("PlaceBid/{id}")]
         [Authorize]
+        [EndpointSummary("Place a bid on an auction (must be higher than current highest)")]
         public async Task<IActionResult> PlaceBid(int id, [FromBody] BidCreateDto dto)
         {
             var userId = GetCurrentUserId();
             if (userId == null) return Unauthorized();
 
-            var success = await _auctionService.PlaceBidAsync(userId.Value, id, dto);
-            return success ? Ok(new { message = "Bid placed" }) : BadRequest("Bid too low, auction expired, or you are the creator.");
+            try
+            {
+                var success = await _auctionService.PlaceBidAsync(userId.Value, id, dto);
+                return Ok(new { message = "Bid placed successfully" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
-        [HttpDelete("{id}/bid")]
+
+        //DELETE /api/auction/{id}/bid
+        [HttpDelete("CancelBid/{id}")]
         [Authorize]
+        [EndpointSummary("Cancel the latest bid of current user if auction is open")]
         public async Task<IActionResult> CancelBid(int id)
         {
             var userId = GetCurrentUserId();
@@ -82,13 +140,31 @@ namespace AuctionHub_backend.Controllers
             return success ? NoContent() : BadRequest("Cannot cancel this bid.");
         }
 
-        [HttpPatch("{id}/disable")]
+
+        //Admin
+        //PATCH /api/auction/{id}/disable
+        [HttpPatch("Disable/{id}")]
         [Authorize(Roles = "Admin")]
+        [Tags("Admin Operations")]
+        [EndpointSummary("Disable an auction")]
         public async Task<IActionResult> Disable(int id)
         {
             var success = await _auctionService.DisableAuctionAsync(id);
             return success ? Ok(new { message = "Auction disabled by admin" }) : NotFound();
         }
+
+        // GET: /api/auction/admin?searchTerm=xxx
+        [HttpGet("GetAllAuctions")]
+        [Authorize(Roles = "Admin")]
+        [Tags("Admin Operations")]
+        [EndpointSummary("Admin: get all auctions")]
+        public async Task<IActionResult> GetAllAuctions([FromQuery] string? searchTerm)
+        {
+            
+            var auctions = await _auctionService.SearchAsync(searchTerm, isOpen: null);
+            return Ok(auctions);
+        }
+
 
         private int? GetCurrentUserId()
         {

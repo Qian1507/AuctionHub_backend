@@ -11,7 +11,10 @@ namespace AuctionHub_backend.Core.Interfaces
         Task<bool> UpdateAsync(int userId, int auctionId, AuctionUpdateDto dto);
         Task<bool> PlaceBidAsync(int userId, int auctionId, BidCreateDto dto);
         Task<bool> CancelLastBidAsync(int userId, int auctionId);
-        Task<bool> DisableAuctionAsync(int auctionId); // admin
+        //Admin
+        Task<bool> DisableAuctionAsync(int auctionId); 
+        Task<IEnumerable<AuctionListDto>> GetAllAuctionsAsync();
         Task<IEnumerable<AuctionDetailDto>> GetExpiredAuctionsAsync();
+        Task<IEnumerable<AuctionListDto>> GetAuctionsByUserIdAsync(int userId);
     }
 }

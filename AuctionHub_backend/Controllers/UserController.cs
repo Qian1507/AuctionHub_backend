@@ -17,7 +17,9 @@ namespace AuctionHub_backend.Controllers
             _userService = userService;
         }
 
-        [HttpPost("register")]
+
+
+        [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto dto)
         {
@@ -30,7 +32,9 @@ namespace AuctionHub_backend.Controllers
             return Ok(new { message = "Registration successful" });
         }
 
-        [HttpPost("login")]
+
+
+        [HttpPost("Login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
         {
@@ -45,8 +49,11 @@ namespace AuctionHub_backend.Controllers
             return Ok(result);
         }
 
-        [HttpPut("password")]
+
+
+        [HttpPatch("Update")]
         [Authorize]
+        [EndpointSummary("Update account password")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDto dto)
@@ -68,8 +75,10 @@ namespace AuctionHub_backend.Controllers
 
         //Admin
 
-        [HttpPut("admin/{id}/deactivate")]
+        [HttpPatch("Deactivate/{id}")]
         [Authorize(Roles = "Admin")]
+        [Tags("Admin Operations")]
+        [EndpointSummary("Deactivate a user account")]
         public async Task<IActionResult> BanUser(int id)
         {
             var ok = await _userService.BanUserAsync(id);
@@ -79,9 +88,10 @@ namespace AuctionHub_backend.Controllers
 
 
 
-        // GET: /api/user/admin
-        [HttpGet("admin")]
+        [HttpGet("GetAllUsers")]
         [Authorize(Roles = "Admin")]
+        [Tags("Admin Operations")]
+        [EndpointSummary("Admin: get all users")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllAsync();
@@ -94,5 +104,8 @@ namespace AuctionHub_backend.Controllers
             var idClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
             return (idClaim != null && int.TryParse(idClaim.Value, out int id)) ? id : null;
         }
+
+
+
     }
 }

@@ -138,12 +138,12 @@ namespace AuctionHub_backend.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = 10000,
                             CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Email = "admin@auktionhub.com",
+                            Email = "admin@gmail.com",
                             IsActive = true,
                             Name = "Admin",
-                            PasswordHash = "admin123",
+                            PasswordHash = "$2a$11$R9h/lSmwzrbaIzZ5xuM9fOnjOMhAyutKqyS7YzO2Pslz57MW9YfRy",
                             Role = "Admin"
                         });
                 });

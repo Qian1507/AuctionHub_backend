@@ -78,5 +78,7 @@ namespace AuctionHub_backend.Data.Repos
         {
             await _context.Bid.AddAsync(bid);
         }
+
+       
     }
 }

@@ -8,7 +8,7 @@ namespace AuctionHub_backend.Data.Interfaces
         Task<Auction?> GetByIdAsync(int id);
         Task<IEnumerable<Auction>> GetAllAsync(string? searchTerm = null);
 
-        // Get all auctions created by a specific user
+        
         Task<IEnumerable<Auction>> GetByUserIdAsync(int userId);
 
         Task AddAsync(Auction auction);
@@ -17,7 +17,7 @@ namespace AuctionHub_backend.Data.Interfaces
 
         void Delete(Auction auction);
 
-        // Check if an auction has any bids (Critical for VG logic: preventing edits if bids exist)
+        
         Task<bool> HasBidsAsync(int auctionId);
         Task AddBidAsync(Bid bid);
 

@@ -25,7 +25,8 @@ namespace AuctionHub_backend.Core.Services
                 Id = u.Id,
                 Name = u.Name,
                 Email = u.Email,
-                Role = u.Role
+                Role = u.Role,
+                IsActive = u.IsActive
             });
         }
 
@@ -37,10 +38,14 @@ namespace AuctionHub_backend.Core.Services
         public async Task<AuthResponseDto?> LoginAsync(UserLoginDto dto)
         {
             var user = await _userRepo.GetByEmailAsync(dto.Email);
-            if (user == null || !user.IsActive) return null;
+
+            if (user == null || !user.IsActive)
+                return null;
+
 
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 return null;
+
 
             var userDto= new UserResponseDto
             {

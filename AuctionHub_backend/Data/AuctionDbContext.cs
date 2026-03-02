@@ -69,13 +69,15 @@ namespace AuctionHub_backend.Data
                 modelBuilder.Entity<Auction>()
                     .Ignore(a => a.IsOpen);
 
-                // Seed an admin user 
-                modelBuilder.Entity<User>().HasData(new User
+            // Seed an admin user 
+            //password:admin123
+            string adminPasswordHash = "$2a$11$R9h/lSmwzrbaIzZ5xuM9fOnjOMhAyutKqyS7YzO2Pslz57MW9YfRy";
+            modelBuilder.Entity<User>().HasData(new User
                 {
-                    Id = 1,
+                    Id = 10000,
                     Name = "Admin",
-                    Email = "admin@auktionhub.com",
-                    PasswordHash = "admin123",
+                    Email = "admin@gmail.com",
+                    PasswordHash = adminPasswordHash,
                     Role = "Admin",
                     IsActive = true,
                     CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
