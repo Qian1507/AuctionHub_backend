@@ -19,6 +19,7 @@ builder.Services.AddDbContext<AuctionDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
 
 //Repos
 builder.Services.AddScoped<IUserRepo, UserRepo>();
@@ -52,6 +53,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseRouting();
+
+app.UseCors(options =>
+    options.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+);
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

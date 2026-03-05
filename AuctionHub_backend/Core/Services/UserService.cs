@@ -100,6 +100,7 @@ namespace AuctionHub_backend.Core.Services
         //Admin
         public async Task<bool> BanUserAsync(int userId)
         {
+            
             var user = await _userRepo.GetByIdAsync(userId);
             if (user == null) return false;
             if (!user.IsActive) return true;

@@ -17,6 +17,7 @@
         public bool IsDisabled { get; set; }
 
         public decimal CurrentHighestBid { get; set; }
+        public bool HasBids => Bids.Any();
         public BidDto? WinningBid { get; set; }
         public int CreatedByUserId { get; set; }
         public string CreatedByUserName { get; set; } = string.Empty;

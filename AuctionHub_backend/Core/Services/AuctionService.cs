@@ -19,7 +19,8 @@ namespace AuctionHub_backend.Core.Services
         }
 
         private static bool IsOpen(Auction a, DateTime nowUtc)
-        => !a.IsDisabled && a.StartDate <= nowUtc && a.EndDate > nowUtc;
+        //=> !a.IsDisabled && a.StartDate <= nowUtc && a.EndDate > nowUtc;
+           => !a.IsDisabled && a.EndDate > nowUtc;
 
         public async Task<bool> CancelLastBidAsync(int userId, int auctionId)
         {
@@ -54,7 +55,7 @@ namespace AuctionHub_backend.Core.Services
 
            
             if (dto.EndDate <= dto.StartDate || dto.EndDate <= now)
-                return false;
+                throw new InvalidOperationException("End date must be later than start date and in the future.");
 
             var auction = new Auction
             {
@@ -116,6 +117,7 @@ namespace AuctionHub_backend.Core.Services
             var dto = MapToDetailDto(auction, orderedBids);
 
             dto.IsOpen = isOpen;
+            
 
             if (!isOpen)
             {
@@ -199,7 +201,7 @@ namespace AuctionHub_backend.Core.Services
 
             if (isOpen == true)
             {
-                all = all.Where(a => IsOpen(a, now));
+                all = all.Where(a => !a.IsDisabled && a.EndDate > now);
             }
             else if (isOpen == false)
             {
@@ -289,7 +291,9 @@ namespace AuctionHub_backend.Core.Services
                 IsDisabled = a.IsDisabled,
                 IsOpen = IsOpen(a, now),
                 CurrentHighestBid = highestBid?.Amount ?? a.StartingPrice,
-                Bids = orderedBids.Select(MapToBidDto).ToList()
+                Bids = orderedBids.Select(MapToBidDto).ToList(),
+                
+
             };
 
             if (highestBid != null)
@@ -351,7 +355,7 @@ namespace AuctionHub_backend.Core.Services
                     EndDate = a.EndDate,
                     CreatedByUserId = a.CreatedByUserId,
                     CreatedByUserName = a.CreatedByUser?.Name ?? string.Empty,
-                    IsOpen = a.IsOpen,
+                    IsOpen =IsOpen(a,now),
                     CurrentHighestBid = currentHighest
                 };
             }).ToList();
