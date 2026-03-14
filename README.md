@@ -260,8 +260,8 @@ For security reasons, the **JWT key should be stored using .NET User Secrets or 
 
 1. **Clone the Repository**
    ```bash
-   git clone [https://github.com/Qian1507/AuctionHub_backend.git](https://github.com/Qian1507/AuctionHub_backend.git)
-   cd AuctionHub_backend
+  git clone https://github.com/Qian1507/AuctionHub_backend.git
+cd AuctionHub_backend
 ---
 
 ## 2 Configure Database
