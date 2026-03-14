@@ -19,7 +19,7 @@ The API includes full interactive documentation using **Swagger UI**.
 
 Below is a preview of the Swagger interface.
 
-![Swagger UI Screenshot](docs/swagger-ui.png)
+![Swagger UI Screenshot](swagger-ui.png)
 
 After running the project you can access Swagger at:
 
