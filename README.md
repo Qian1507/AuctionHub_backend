@@ -13,6 +13,26 @@ The API is fully documented using **Swagger (OpenAPI 3.0)** and is designed to w
 
 ---
 
+# 🔗 Related Project
+
+AuctionHub uses a separate frontend repository.
+
+Frontend:
+
+AuctionHub_frontend
+
+Built with:
+
+* React
+* TypeScript
+* Vite
+
+Repository:
+
+https://github.com/Qian1507/AuctionHub_frontend
+
+---
+
 # 🖼️ API Documentation
 
 The API includes full interactive documentation using **Swagger UI**.
@@ -340,25 +360,6 @@ http://localhost:5173
 
 ---
 
-# 🔗 Related Project
-
-AuctionHub uses a separate frontend repository.
-
-Frontend:
-
-AuctionHub_frontend
-
-Built with:
-
-* React
-* TypeScript
-* Vite
-
-Repository:
-
-https://github.com/Qian1507/AuctionHub_frontend
-
----
 
 # 📄 License
 
